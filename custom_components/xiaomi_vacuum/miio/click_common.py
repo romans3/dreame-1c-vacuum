@@ -13,7 +13,7 @@ from typing import Union
 
 import click
 
-from .. import miio
+import miio
 
 from .exceptions import DeviceError
 

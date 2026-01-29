@@ -127,14 +127,7 @@ class MiIOProtocol:
                 break
 
     def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
-        """Build and send the given command.
-        Note that this will implicitly call :func:`send_handshake` to do a handshake,
-        and will re-try in case of errors while incrementing the `_id` by 100.
-
-        :param str command: Command to send
-        :param dict parameters: Parameters to send, or an empty list FIXME
-        :param retry_count: How many times to retry in case of failure
-        :raises DeviceException: if an error has occurred during communication."""
+        """Build and send the given command."""
 
         if not self.lazy_discover or not self._discovered:
             self.send_handshake()
@@ -146,7 +139,9 @@ class MiIOProtocol:
         else:
             cmd["params"] = []
 
-        send_ts = self._device_ts + datetime.timedelta(seconds=1)
+        # ✅ timestamp sempre timezone-aware in UTC
+        send_ts = (self._device_ts + datetime.timedelta(seconds=1)).replace(tzinfo=datetime.UTC)
+
         header = {
             "length": 0,
             "unknown": 0x00000000,

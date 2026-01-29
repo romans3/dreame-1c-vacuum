@@ -2,15 +2,8 @@
 
 This module contains the implementation of the routines to encrypt and decrypt
 miIO payloads with a device-specific token.
-
-The payloads to be encrypted (to be passed to a device) are expected to be
-JSON objects, the same applies for decryption where they are converted
-automatically to JSON objects.
-If the decryption fails, raw bytes as returned by the device are returned.
-
-An usage example can be seen in the source of :func:`miio.Device.send`.
-If the decryption fails, raw bytes as returned by the device are returned.
 """
+
 import calendar
 import datetime
 import hashlib
@@ -41,12 +34,21 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 _LOGGER = logging.getLogger(__name__)
 
 
+# --- Wrapper per compatibilità ---
+def utc_from_timestamp(ts: int) -> datetime.datetime:
+    """Restituisce un datetime UTC timezone-aware (compatibile con Python <3.12)."""
+    try:
+        return datetime.datetime.fromtimestamp(ts, datetime.UTC)
+    except AttributeError:
+        # Fallback per versioni più vecchie
+        return datetime.datetime.utcfromtimestamp(ts)
+
+
 class Utils:
-    """ This class is adapted from the original xpn.py code by gst666 """
+    """Utility functions for miIO protocol."""
 
     @staticmethod
     def verify_token(token: bytes):
-        """Checks if the given token is of correct type and length."""
         if not isinstance(token, bytes):
             raise TypeError("Token must be bytes")
         if len(token) != 16:
@@ -54,53 +56,37 @@ class Utils:
 
     @staticmethod
     def md5(data: bytes) -> bytes:
-        """Calculates a md5 hashsum for the given bytes object."""
         checksum = hashlib.md5()
         checksum.update(data)
         return checksum.digest()
 
     @staticmethod
     def key_iv(token: bytes) -> Tuple[bytes, bytes]:
-        """Generate an IV used for encryption based on given token."""
         key = Utils.md5(token)
         iv = Utils.md5(key + token)
         return key, iv
 
     @staticmethod
     def encrypt(plaintext: bytes, token: bytes) -> bytes:
-        """Encrypt plaintext with a given token.
-
-        :param bytes plaintext: Plaintext (json) to encrypt
-        :param bytes token: Token to use
-        :return: Encrypted bytes"""
         if not isinstance(plaintext, bytes):
             raise TypeError("plaintext requires bytes")
         Utils.verify_token(token)
         key, iv = Utils.key_iv(token)
         padder = padding.PKCS7(128).padder()
-
         padded_plaintext = padder.update(plaintext) + padder.finalize()
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-
         encryptor = cipher.encryptor()
         return encryptor.update(padded_plaintext) + encryptor.finalize()
 
     @staticmethod
     def decrypt(ciphertext: bytes, token: bytes) -> bytes:
-        """Decrypt ciphertext with a given token.
-
-        :param bytes ciphertext: Ciphertext to decrypt
-        :param bytes token: Token to use
-        :return: Decrypted bytes object"""
         if not isinstance(ciphertext, bytes):
             raise TypeError("ciphertext requires bytes")
         Utils.verify_token(token)
         key, iv = Utils.key_iv(token)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-
         decryptor = cipher.decryptor()
         padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-
         unpadder = padding.PKCS7(128).unpadder()
         unpadded_plaintext = unpadder.update(padded_plaintext)
         unpadded_plaintext += unpadder.finalize()
@@ -108,81 +94,55 @@ class Utils:
 
     @staticmethod
     def checksum_field_bytes(ctx: Dict[str, Any]) -> bytearray:
-        """Gather bytes for checksum calculation"""
         x = bytearray(ctx["header"].data)
         x += ctx["_"]["token"]
         if "data" in ctx:
             x += ctx["data"].data
-            # print("DATA: %s" % ctx["data"])
-
         return x
 
     @staticmethod
     def get_length(x) -> int:
-        """Return total packet length."""
-        datalen = x._.data.length  # type: int
+        datalen = x._.data.length
         return datalen + 32
 
     @staticmethod
     def is_hello(x) -> bool:
-        """Return if packet is a hello packet."""
-        # not very nice, but we know that hellos are 32b of length
         if "length" in x:
             val = x["length"]
         else:
             val = x.header.value["length"]
-
         return bool(val == 32)
 
 
 class TimeAdapter(Adapter):
-    """Adapter for timestamp conversion."""
+    """Adapter per conversione timestamp."""
 
     def _encode(self, obj, context, path):
-        return calendar.timegm(obj.timetuple())
+        return int(obj.timestamp())
 
     def _decode(self, obj, context, path):
-        return datetime.datetime.utcfromtimestamp(obj)
+        # Usa wrapper retrocompatibile
+        return utc_from_timestamp(obj)
 
 
 class EncryptionAdapter(Adapter):
-    """Adapter to handle communication encryption."""
-
     def _encode(self, obj, context, path):
-        """Encrypt the given payload with the token stored in the context.
-
-        :param obj: JSON object to encrypt"""
-        # pp(context)
         return Utils.encrypt(
             json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
         )
 
     def _decode(self, obj, context, path):
-        """Decrypts the given payload with the token stored in the context.
-
-        :return str: JSON object"""
         try:
-            # pp(context)
             decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
         except Exception:
             _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
             return obj
 
-        # list of adaption functions for malformed json payload (quirks)
         decrypted_quirks = [
-            # try without modifications first
-            lambda decrypted_bytes: decrypted_bytes,
-            # powerstrip returns malformed JSON if the device is not
-            # connected to the cloud, so we try to fix it here carefully.
-            lambda decrypted_bytes: decrypted_bytes.replace(
-                b',,"otu_stat"', b',"otu_stat"'
-            ),
-            # xiaomi cloud returns malformed json when answering _sync.batch_gen_room_up_url
-            # command so try to sanitize it
-            lambda decrypted_bytes: decrypted_bytes[: decrypted_bytes.rfind(b"\x00")]
-            if b"\x00" in decrypted_bytes
-            else decrypted_bytes,
+            lambda d: d,
+            lambda d: d.replace(b',,"otu_stat"', b',"otu_stat"'),
+            lambda d: d[: d.rfind(b"\x00")] if b"\x00" in d else d,
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
@@ -190,8 +150,6 @@ class EncryptionAdapter(Adapter):
             try:
                 return json.loads(decoded)
             except Exception as ex:
-                # log the error when decrypted bytes couldn't be loaded
-                # after trying all quirk adaptions
                 if i == len(decrypted_quirks) - 1:
                     _LOGGER.error("unable to parse json '%s': %s", decoded, ex)
 
@@ -199,7 +157,6 @@ class EncryptionAdapter(Adapter):
 
 
 Message = Struct(
-    # for building we need data before anything else.
     "data" / Pointer(32, RawCopy(EncryptionAdapter(GreedyBytes))),
     "header"
     / RawCopy(
@@ -208,7 +165,7 @@ Message = Struct(
             "length" / Rebuild(Int16ub, Utils.get_length),
             "unknown" / Default(Int32ub, 0x00000000),
             "device_id" / Hex(Bytes(4)),
-            "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow())),
+            "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.now(datetime.UTC))),
         )
     ),
     "checksum"
