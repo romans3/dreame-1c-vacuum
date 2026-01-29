@@ -130,6 +130,9 @@ class DreameVacuumEntity(StateVacuumEntity):
         self._name = name
         self._vacuum = vacuum
 
+        # Unique ID per Home Assistant
+        self._attr_unique_id = f"xiaomi_vacuum_{name.lower().replace(' ', '_')}"
+
         self._fan_speeds = None
         self._fan_speeds_reverse = None
         self._current_fan_speed = None
