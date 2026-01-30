@@ -8,16 +8,12 @@ Using https://github.com/rytilahti/python-miio for the protocol.
 - Manually: add the "xiaomi_vacuum" folder to the /config/custom_components folder;
 - With HACS: go in HACS, click on Integrations, click on the three little dots at top of the screen and selection "custom repositories", add this github url, select "Integration" as repository, and click ADD. Then go to the Integrations tab of HACS, and install the "Xiaomi 1C STYTJ01ZHM" integration.
 
-### Code to add to configuration.yaml:
+### SETTING BY UI:
+<img width="591" height="540" alt="ui" src="https://github.com/user-attachments/assets/dcc365b1-840f-4af5-baba-29ad698ee2a3" />
 
-```
-vacuum:
-  - platform: xiaomi_vacuum
-    host: <ip>
-    token: "<token>"
-    name: <name>
-    unique_id: vacuum.<name>
-```
+<img width="1303" height="427" alt="image" src="https://github.com/user-attachments/assets/1e535061-901b-4c50-802f-be3e769b55fb" />
+
+<img width="480" height="467" alt="1c" src="https://github.com/user-attachments/assets/a8336915-32c1-45c0-86a6-8d06292a236c" />
 
 To retrieve the token, follow the default integration <a href="https://www.home-assistant.io/integrations/vacuum.xiaomi_miio/#retrieving-the-access-token">instructions</a>.
 
