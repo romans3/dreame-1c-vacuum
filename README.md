@@ -10,10 +10,9 @@ Using https://github.com/rytilahti/python-miio for the protocol.
 
 ### SETTING BY UI:
 <img width="591" height="540" alt="ui" src="https://github.com/user-attachments/assets/dcc365b1-840f-4af5-baba-29ad698ee2a3" />
-
 <img width="1303" height="427" alt="image" src="https://github.com/user-attachments/assets/1e535061-901b-4c50-802f-be3e769b55fb" />
-
 <img width="480" height="467" alt="1c" src="https://github.com/user-attachments/assets/a8336915-32c1-45c0-86a6-8d06292a236c" />
+<img width="477" height="868" alt="image" src="https://github.com/user-attachments/assets/78c7a197-7ff1-445c-9f84-9417ba49851b" />
 
 To retrieve the token, follow the default integration <a href="https://www.home-assistant.io/integrations/vacuum.xiaomi_miio/#retrieving-the-access-token">instructions</a>.
 
