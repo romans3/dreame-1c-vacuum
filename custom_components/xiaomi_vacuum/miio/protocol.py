@@ -4,7 +4,6 @@ This module contains the implementation of the routines to encrypt and decrypt
 miIO payloads with a device-specific token.
 """
 
-import calendar
 import datetime
 import hashlib
 import json
