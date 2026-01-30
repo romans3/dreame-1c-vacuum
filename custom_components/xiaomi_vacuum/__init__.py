@@ -1,19 +1,68 @@
-"""Xiaomi Vacuum 1C component"""
+"""Xiaomi Vacuum 1C – modern integration with config_flow."""
 
-from homeassistant.core import HomeAssistant
+import logging
+
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 
-DOMAIN = "xiaomi_vacuum"
+from .const import (
+    DOMAIN,
+    PLATFORMS,
+    DATA_CLIENT,
+    DATA_COORDINATOR,
+)
+from .miio import DreameVacuum
+from .coordinator import async_create_coordinator
 
-async def async_setup(hass: HomeAssistant, config):
-    """Set up the Xiaomi Vacuum 1C integration (YAML only)."""
+_LOGGER = logging.getLogger(__name__)
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """YAML setup is no longer used."""
+    return True
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Xiaomi Vacuum 1C from a config entry."""
     hass.data.setdefault(DOMAIN, {})
+
+    host = entry.data.get("host")
+    token = entry.data.get("token")
+    name = entry.data.get("name")
+
+    _LOGGER.info("Setting up Xiaomi Vacuum 1C at %s (name: %s)", host, name)
+
+    client = DreameVacuum(host, token)
+
+    coordinator = await async_create_coordinator(hass, client, entry)
+
+    hass.data[DOMAIN][entry.entry_id] = {
+        DATA_CLIENT: client,
+        DATA_COORDINATOR: coordinator,
+    }
+
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Config entries are not used for this integration."""
-    return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+
+    return unload_ok
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload when entry is updated."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle migration of config entries."""
+    # Placeholder for future migrations (versions, data shape, etc.)
+    _LOGGER.debug("Migrating Xiaomi Vacuum 1C entry %s, version %s", entry.entry_id, entry.version)
     return True

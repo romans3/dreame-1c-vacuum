@@ -1,13 +1,9 @@
 {
-  "domain": "dreame_vacuum",
-  "name": "Dreame Vacuum",
-  "codeowners": [
-    "@tasshack"
-  ],
+  "domain": "xiaomi_vacuum",
+  "name": "Xiaomi Vacuum 1C",
+  "version": "2.0.0",
+  "documentation": "https://github.com/romans3/dreame-1c-vacuum",
   "config_flow": true,
-  "documentation": "https://github.com/Tasshack/dreame-vacuum",
-  "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/Tasshack/dreame-vacuum/issues",
   "requirements": [
     "pillow",
     "numpy",
@@ -18,5 +14,10 @@
     "mini-racer",
     "paho-mqtt"
   ],
-  "version": "v1.0.7"
+  "dependencies": [],
+  "codeowners": ["@augustas2"],
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "loggers": ["miio", "xiaomi_vacuum"],
+  "supported_platforms": ["vacuum", "sensor"]
 }
