@@ -130,6 +130,7 @@ class DreameErrorSensor(DreameBaseSensor):
 
         self._attr_name = f"{name} Error"
         self._attr_unique_id = f"{uid}_error"
+        self._attr_icon = "mdi:check-circle-outline"
 
     @property
     def native_value(self):
@@ -153,6 +154,7 @@ class DreameCleaningAreaSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_cleaning_area"
         self._attr_native_unit_of_measurement = "m²"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:ruler-square"
 
     @property
     def native_value(self):
@@ -174,6 +176,7 @@ class DreameCleaningTimeSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_cleaning_time"
         self._attr_native_unit_of_measurement = "min"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:timer-outline"
 
     @property
     def native_value(self):
@@ -195,6 +198,7 @@ class DreameMainBrushLifeSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_main_brush_life"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:car-turbocharger"
 
     @property
     def native_value(self):
@@ -216,6 +220,7 @@ class DreameSideBrushLifeSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_side_brush_life"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:pinwheel-outline"
 
     @property
     def native_value(self):
@@ -237,6 +242,7 @@ class DreameFilterLifeSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_filter_life"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:air-filter"
 
     @property
     def native_value(self):
@@ -258,6 +264,7 @@ class DreameMainBrushTimeLeftSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_main_brush_time_left"
         self._attr_native_unit_of_measurement = "h"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:car-turbocharger"
 
     @property
     def native_value(self):
@@ -279,6 +286,7 @@ class DreameSideBrushTimeLeftSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_side_brush_time_left"
         self._attr_native_unit_of_measurement = "h"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:pinwheel-outline"
 
     @property
     def native_value(self):
@@ -300,6 +308,7 @@ class DreameFilterTimeLeftSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_filter_left_time"
         self._attr_native_unit_of_measurement = "h"
         self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_icon = "mdi:air-filter"
 
     @property
     def native_value(self):
@@ -319,6 +328,7 @@ class DreameTotalCleaningCountSensor(DreameBaseSensor):
         self._attr_name = f"{name} Total Cleaning Count"
         self._attr_unique_id = f"{uid}_total_cleaning_count"
         self._attr_state_class = SensorStateClass.TOTAL
+        self._attr_icon = "mdi:counter"
 
     @property
     def native_value(self):
@@ -339,6 +349,7 @@ class DreameTotalCleaningAreaSensor(DreameBaseSensor):
         self._attr_unique_id = f"{uid}_total_cleaning_area"
         self._attr_native_unit_of_measurement = "m²"
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        self._attr_icon = "mdi:set-square"
 
     @property
     def native_value(self):
