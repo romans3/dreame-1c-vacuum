@@ -1,6 +1,10 @@
 # Xiaomi Dreame 1C Vacuum Integration
 
-Custom component for Xiaomi Dreame vacuum 1C (dreame.vacuum.mc1808).
+Custom component for 
+
+- Xiaomi Dreame vacuum 1C (dreame.vacuum.mc1808).
+
+- Mijia Vacuum Cleaner 1C (STYTJ01ZHM)
 
 Using https://github.com/rytilahti/python-miio for the protocol.
 
