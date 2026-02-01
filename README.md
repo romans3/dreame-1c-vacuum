@@ -12,7 +12,7 @@ Using https://github.com/rytilahti/python-miio for the protocol.
 
 # Installation:
 - Manually: add the "xiaomi_vacuum" folder to the /config/custom_components folder;
-- With HACS: go in HACS, click on Integrations, click on the three little dots at top of the screen and selection "custom repositories", add this github url, select "Integration" as repository, and click ADD. Then go to the Integrations tab of HACS, and install the "Xiaomi 1C STYTJ01ZHM" integration.
+- With UI: go in INTEGRATIONS, click on ADD Integrations and selection "Xiaomi Vacuum 1C", and click ADD. Then enter setup request value.
 
 ### SETTING BY UI:
 <img width="591" height="540" alt="ui" src="https://github.com/user-attachments/assets/dcc365b1-840f-4af5-baba-29ad698ee2a3" />
