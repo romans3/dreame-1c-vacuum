@@ -12,6 +12,7 @@ Using https://github.com/rytilahti/python-miio for the protocol.
 
 # Installation:
 - Manually: add the "xiaomi_vacuum" folder to the /config/custom_components folder;
+
 - With UI: go in INTEGRATIONS, click on ADD Integrations and selection "Xiaomi Vacuum 1C", and click ADD. Then enter setup request value.
 
 ### SETTING BY UI:
@@ -23,3 +24,5 @@ Using https://github.com/rytilahti/python-miio for the protocol.
 To retrieve the token, follow the default integration <a href="https://www.home-assistant.io/integrations/vacuum.xiaomi_miio/#retrieving-the-access-token">instructions</a>.
 
 Works with https://github.com/denysdovhan/vacuum-card
+
+Fully Works with Homeassistant 2026.2.0
