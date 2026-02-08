@@ -1,0 +1,123 @@
+{
+  "title": "Xiaomi Vacuum 1C",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurazione Xiaomi Vacuum 1C",
+        "description": "Inserisci i dati di connessione del tuo Dreame/Xiaomi Vacuum 1C.",
+        "data": {
+          "host": "Indirizzo IP",
+          "token": "Token",
+          "name": "Nome dispositivo"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile connettersi all'aspirapolvere.",
+      "invalid_token": "Token non valido.",
+      "unknown": "Errore imprevisto."
+    },
+    "abort": {
+      "already_configured": "Questo aspirapolvere è già configurato."
+    }
+  },
+
+  "entity": {
+    "sensor": {
+      "battery": {
+        "name": "Batteria"
+      },
+      "error": {
+        "name": "Errore"
+      },
+      "cleaning_area": {
+        "name": "Area pulita"
+      },
+      "cleaning_time": {
+        "name": "Tempo di pulizia"
+      },
+      "main_brush_life": {
+        "name": "Vita spazzola principale"
+      },
+      "side_brush_life": {
+        "name": "Vita spazzola laterale"
+      },
+      "filter_life": {
+        "name": "Vita filtro"
+      },
+      "main_brush_time_left": {
+        "name": "Ore rimanenti spazzola principale"
+      },
+      "side_brush_time_left": {
+        "name": "Ore rimanenti spazzola laterale"
+      },
+      "filter_time_left": {
+        "name": "Ore rimanenti filtro"
+      },
+      "total_cleaning_count": {
+        "name": "Numero totale pulizie"
+      },
+      "total_cleaning_area": {
+        "name": "Area totale pulita"
+      },
+      "last_seen": {
+        "name": "Ultimo contatto"
+      },
+      "status": {
+        "name": "Stato"
+      }
+    }
+  },
+
+  "state": {
+    "cleaning": "Pulizia",
+    "paused": "In pausa",
+    "returning": "Ritorno alla base",
+    "docked": "In carica",
+    "idle": "In attesa",
+    "error": "Errore",
+    "offline": "Offline"
+  },
+
+  "friendly_status": {
+    "cleaning": "Pulizia in corso",
+    "paused": "In pausa",
+    "returning": "Tornando alla base",
+    "docked": "In carica",
+    "idle": "In attesa",
+    "error": "Errore",
+    "unknown": "Sconosciuto"
+  },
+
+  "errors": {
+    "NoError": "Nessun errore",
+    "Drop": "Rilevata caduta",
+    "Cliff": "Rilevato dirupo",
+    "Bumper": "Urto rilevato",
+    "Gesture": "Errore gesto",
+    "Bumper_repeat": "Urti ripetuti",
+    "Drop_repeat": "Cadute ripetute",
+    "Optical_flow": "Errore sensore ottico",
+    "No_box": "Cassetto polvere mancante",
+    "No_tankbox": "Serbatoio acqua mancante",
+    "Waterbox_empty": "Serbatoio acqua vuoto",
+    "Box_full": "Cassetto polvere pieno",
+    "Brush": "Errore spazzola principale",
+    "Side_brush": "Errore spazzola laterale",
+    "Fan": "Errore ventola",
+    "Left_wheel_motor": "Errore motore ruota sinistra",
+    "Right_wheel_motor": "Errore motore ruota destra",
+    "Turn_suffocate": "Rotazione bloccata",
+    "Forward_suffocate": "Movimento bloccato",
+    "Charger_get": "Errore ricarica",
+    "Battery_low": "Batteria scarica",
+    "Charge_fault": "Guasto ricarica",
+    "Battery_percentage": "Errore percentuale batteria",
+    "Heart": "Errore heartbeat",
+    "Camera_occlusion": "Telecamera ostruita",
+    "Camera_fault": "Guasto telecamera",
+    "Event_battery": "Evento batteria",
+    "Forward_looking": "Errore sensore frontale",
+    "Gyroscope": "Errore giroscopio"
+  }
+}
