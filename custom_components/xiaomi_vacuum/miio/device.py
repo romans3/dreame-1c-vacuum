@@ -192,17 +192,6 @@ class Device(metaclass=DeviceGroupMeta):
         return self._protocol.send("miIO.config_router", params)[0]
 
     def get_properties(self, properties, *, max_properties=None):
-        """Request properties in slices based on given max_properties.
-
-        This is necessary as some devices have limitation on how many
-        properties can be queried at once.
-
-        If `max_properties` is None, all properties are requested at once.
-
-        :param list properties: List of properties to query from the device.
-        :param int max_properties: Number of properties that can be requested at once.
-        :return List of property values.
-        """
         if self.device_type == DeviceType.MiOT:
             get_property_method = "get_properties"
         else:
@@ -210,26 +199,18 @@ class Device(metaclass=DeviceGroupMeta):
 
         _props = properties.copy()
         values = []
+
         while _props:
             try:
                 properties_to_request = _props[:max_properties]
                 values.extend(self.send(get_property_method, properties_to_request))
             except DeviceException:
-                _LOGGER.error("Unable to request properties %s", properties_to_request)
-                #values.append(["request-failed"] * max_properties)
+                _LOGGER.debug("Skipping unsupported MIoT properties: %s", properties_to_request)
+                values.extend([None] * len(properties_to_request))
+
             if max_properties is None:
                 break
 
             _props[:] = _props[max_properties:]
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
 
         return values
