@@ -23,7 +23,6 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Xiaomi Vacuum 1C from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
     host = entry.data.get("host")
@@ -34,11 +33,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     client = DreameVacuum(host, token)
 
+    # Recupero info reali dal robot (miIO.info)
+    try:
+        info = client.info()
+    except Exception as e:
+        _LOGGER.warning("Unable to read device info: %s", e)
+        info = None
+
     coordinator = await async_create_coordinator(hass, client, entry)
 
     hass.data[DOMAIN][entry.entry_id] = {
         DATA_CLIENT: client,
         DATA_COORDINATOR: coordinator,
+        "device_info_raw": info,   # <── SALVATO QUI
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

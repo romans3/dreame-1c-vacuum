@@ -81,52 +81,60 @@ async def async_setup_entry(hass, entry, async_add_entities):
     client = data[DATA_CLIENT]
 
     name = entry.data.get("name")
+    info = data.get("device_info_raw")
 
-    vacuum_entity = DreameVacuumEntity(name, coordinator, client)
+    vacuum_entity = DreameVacuumEntity(name, coordinator, client, info)
     async_add_entities([vacuum_entity])
 
 
-class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER corretto
+class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):
     """Representation of the Dreame 1C vacuum."""
 
-    def __init__(self, name, coordinator, client):
-        # ✅ FIXED multiple inheritance HA 2026
+    def __init__(self, name, coordinator, client, info):
         StateVacuumEntity.__init__(self)
         CoordinatorEntity.__init__(self, coordinator)
-        
+
         self._client = client
+
+        # Unique ID stabile e corretto
+        uid = f"xiaomi_vacuum_{name.lower().replace(' ', '_')}"
+        self._attr_unique_id = uid
         self._attr_name = name
-        self._attr_unique_id = f"xiaomi_vacuum_{name.lower().replace(' ', '_')}"
         self._attr_supported_features = SUPPORT_XIAOMI
 
+        # DeviceInfo corretto e compatibile
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, self._attr_unique_id)},
+            identifiers={(DOMAIN, uid)},
             name=name,
             manufacturer="Dreame",
-            model="Vacuum 1C",
+            model=getattr(info, "model", "Vacuum 1C") if info else "Vacuum 1C",
+            sw_version=getattr(info, "firmware_version", None) if info else None,
+            hw_version=getattr(info, "hardware_version", None) if info else None,
+            connections={
+                ("mac", getattr(info, "mac_address"))
+            } if info and getattr(info, "mac_address", None) else None,
+            configuration_url=f"http://{getattr(client, 'ip', None)}" if getattr(client, 'ip', None) else None,
         )
 
     @property
     def activity(self) -> VacuumActivity:
-        """Return the vacuum activity."""
         state = self.coordinator.data
         if not state:
             return VacuumActivity.IDLE
-            
-        status = getattr(state, 'status', 2)  # ✅ safe getattr
+
+        status = getattr(state, "status", 2)
         try:
             status = int(status)
         except (ValueError, TypeError):
             return VacuumActivity.IDLE
 
-        # ✅ Dreame 1C stati reali
         mapping = {
-            1: VacuumActivity.CLEANING,     # cleaning
-            2: VacuumActivity.IDLE,         # idle/standby
-            3: VacuumActivity.PAUSED,       # paused
-            4: VacuumActivity.ERROR,        # error
-            5: VacuumActivity.RETURNING,    # returning
-            6: VacuumActivity.DOCKED,       # docked/charging
+            1: VacuumActivity.CLEANING,
+            2: VacuumActivity.IDLE,
+            3: VacuumActivity.PAUSED,
+            4: VacuumActivity.ERROR,
+            5: VacuumActivity.RETURNING,
+            6: VacuumActivity.DOCKED,
         }
         return mapping.get(status, VacuumActivity.IDLE)
 
@@ -135,7 +143,7 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
         state = self.coordinator.data
         if not state:
             return None
-        return SPEED_CODE_TO_NAME.get(getattr(state, 'fan_speed', None), "Unknown")
+        return SPEED_CODE_TO_NAME.get(getattr(state, "fan_speed", None), "Unknown")
 
     @property
     def fan_speed_list(self):
@@ -146,7 +154,7 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
         state = self.coordinator.data
         if not state:
             return None
-        return WATER_CODE_TO_NAME.get(getattr(state, 'water_level', None), "Unknown")
+        return WATER_CODE_TO_NAME.get(getattr(state, "water_level", None), "Unknown")
 
     @property
     def water_level_list(self):
@@ -158,21 +166,38 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
         if not state:
             return {}
 
+        status = self.activity.name.lower()
+        friendly_status = {
+            "cleaning": "Pulizia in corso",
+            "paused": "In pausa",
+            "returning": "Tornando alla base",
+            "docked": "In carica",
+            "idle": "In attesa",
+            "error": "Errore",
+        }.get(status, "Sconosciuto")
+
         return {
-            "status": str(self.activity),
-            "error": ERROR_CODE_TO_ERROR.get(getattr(state, 'error', 0), "Unknown"),
-            "cleaning_area": getattr(state, 'area', None),
-            "cleaning_time": getattr(state, 'timer', None),
-            "total_cleaning_count": getattr(state, 'total_clean_count', None),
-            "total_cleaning_area": getattr(state, 'total_area', None),
-            "main_brush_life_level": getattr(state, 'brush_life_level', None),
-            "side_brush_life_level": getattr(state, 'brush_life_level2', None),
-            "filter_life_level": getattr(state, 'filter_life_level', None),
-            "water_level": WATER_CODE_TO_NAME.get(getattr(state, 'water_level', None), "Unknown"),
+            "status": status,
+            "friendly_status": friendly_status,
+            "is_cleaning": status == "cleaning",
+            "is_paused": status == "paused",
+            "is_returning": status == "returning",
+            "is_docked": status == "docked",
+            "is_idle": status == "idle",
+            "is_error": status == "error",
+            "error": ERROR_CODE_TO_ERROR.get(getattr(state, "error", 0), "Unknown"),
+            "cleaning_area": getattr(state, "area", None),
+            "cleaning_time": getattr(state, "timer", None),
+            "total_cleaning_count": getattr(state, "total_clean_count", None),
+            "total_cleaning_area": getattr(state, "total_area", None),
+            "main_brush_life_level": getattr(state, "brush_life_level", None),
+            "side_brush_life_level": getattr(state, "brush_life_level2", None),
+            "filter_life_level": getattr(state, "filter_life_level", None),
+            "water_level": WATER_CODE_TO_NAME.get(getattr(state, "water_level", None), "Unknown"),
+            "ip_address": getattr(self._client, "ip", None),
         }
 
     async def _exec(self, label, func, *args):
-        """Execute command safely."""
         try:
             await self.hass.async_add_executor_job(func, *args)
             await self.coordinator.async_request_refresh()
@@ -186,8 +211,16 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
         await self._exec("Unable to stop vacuum", self._client.stop)
 
     async def async_pause(self):
-        # ✅ FIX: pausa separata da stop
-        await self._exec("Unable to pause vacuum", self._client.pause)
+        state = self.coordinator.data
+        if not state:
+            return
+
+        status = getattr(state, "status", 2)
+
+        if status == 1:
+            await self._exec("Unable to pause vacuum", self._client.stop)
+        elif status == 3:
+            await self._exec("Unable to resume vacuum", self._client.start)
 
     async def async_return_to_base(self, **kwargs):
         await self._exec("Unable to return home", self._client.return_home)
@@ -198,7 +231,6 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
     async def async_set_fan_speed(self, fan_speed, **kwargs):
         reverse = {v: k for k, v in SPEED_CODE_TO_NAME.items()}
         if fan_speed not in reverse:
-            _LOGGER.error("Invalid fan speed: %s", fan_speed)
             return
         await self._exec("Unable to set fan speed", self._client.set_fan_speed, reverse[fan_speed])
 
@@ -207,8 +239,9 @@ class DreameVacuumEntity(StateVacuumEntity, CoordinatorEntity):  # ✅ ORDER cor
             reverse = {v: k for k, v in WATER_CODE_TO_NAME.items()}
             level = params.get("water_level")
             if level not in reverse:
-                _LOGGER.error("Invalid water level: %s", level)
                 return
-            await self._exec("Unable to set water level", self._client.set_water_level, reverse[level])
-        else:
-            _LOGGER.error("Unsupported command: %s", command)
+            await self._exec(
+                "Unable to set water level",
+                self._client.set_water_level,
+                reverse[level]
+            )

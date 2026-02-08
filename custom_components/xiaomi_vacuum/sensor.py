@@ -71,9 +71,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
         DreameFilterTimeLeftSensor(name, uid, coordinator),
         DreameTotalCleaningCountSensor(name, uid, coordinator),
         DreameTotalCleaningAreaSensor(name, uid, coordinator),
+        VacuumLastSeenSensor(name, uid, coordinator),
+        VacuumStatusSensor(name, uid, coordinator),  # <── NUOVO SENSORE
     ]
 
     async_add_entities(entities)
+
 
 # ---------------------------------------------------------------------------
 # BASE CLASS
@@ -88,12 +91,69 @@ class DreameBaseSensor(CoordinatorEntity, SensorEntity):
         self._vacuum_name = name
         self._vacuum_uid = uid
 
+        # DeviceInfo minimal → eredita quello avanzato dal vacuum
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, uid)},
-            name=name,
-            manufacturer="Dreame",
-            model="Vacuum 1C",
+            identifiers={(DOMAIN, uid)}
         )
+
+
+# ---------------------------------------------------------------------------
+# VACUUM STATUS SENSOR (NUOVO)
+# ---------------------------------------------------------------------------
+
+class VacuumStatusSensor(DreameBaseSensor):
+    """Unified status sensor with friendly text and booleans."""
+
+    def __init__(self, name, uid, coordinator):
+        super().__init__(name, uid, coordinator)
+
+        self._attr_name = f"{name} Status"
+        self._attr_unique_id = f"{uid}_status"
+        self._attr_icon = "mdi:robot-vacuum"
+
+    @property
+    def native_value(self):
+        """Return the raw status (cleaning, paused, docked, etc.)."""
+        state = self.coordinator.data
+        if not state:
+            return "offline"
+
+        # Mapping come nel vacuum
+        status_map = {
+            1: "cleaning",
+            2: "idle",
+            3: "paused",
+            4: "error",
+            5: "returning",
+            6: "docked",
+        }
+
+        status = status_map.get(getattr(state, "status", 2), "idle")
+        return status
+
+    @property
+    def extra_state_attributes(self):
+        """Return friendly status and boolean flags."""
+        status = self.native_value
+
+        friendly_status = {
+            "cleaning": "Pulizia in corso",
+            "paused": "In pausa",
+            "returning": "Tornando alla base",
+            "docked": "In carica",
+            "idle": "In attesa",
+            "error": "Errore",
+        }.get(status, "Sconosciuto")
+
+        return {
+            "friendly_status": friendly_status,
+            "is_cleaning": status == "cleaning",
+            "is_paused": status == "paused",
+            "is_returning": status == "returning",
+            "is_docked": status == "docked",
+            "is_idle": status == "idle",
+            "is_error": status == "error",
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -115,7 +175,7 @@ class DreameBatterySensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.battery if state else None
+        return int(getattr(state, "battery", 0) or 0)
 
 
 # ---------------------------------------------------------------------------
@@ -130,14 +190,20 @@ class DreameErrorSensor(DreameBaseSensor):
 
         self._attr_name = f"{name} Error"
         self._attr_unique_id = f"{uid}_error"
-        self._attr_icon = "mdi:check-circle-outline"
+
+    @property
+    def icon(self):
+        state = self.coordinator.data
+        if not state:
+            return "mdi:cloud-off-outline"
+        return "mdi:alert-circle-outline" if getattr(state, "error", 0) != 0 else "mdi:check-circle-outline"
 
     @property
     def native_value(self):
         state = self.coordinator.data
         if not state:
-            return None
-        return ERROR_CODE_TO_ERROR.get(state.error, "Unknown")
+            return "offline"
+        return ERROR_CODE_TO_ERROR.get(getattr(state, "error", None), "Unknown")
 
 
 # ---------------------------------------------------------------------------
@@ -159,7 +225,7 @@ class DreameCleaningAreaSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.area if state else None
+        return getattr(state, "area", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +247,7 @@ class DreameCleaningTimeSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.timer if state else None
+        return getattr(state, "timer", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -203,7 +269,7 @@ class DreameMainBrushLifeSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.brush_life_level if state else None
+        return getattr(state, "brush_life_level", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -225,7 +291,7 @@ class DreameSideBrushLifeSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.brush_life_level2 if state else None
+        return getattr(state, "brush_life_level2", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -247,7 +313,7 @@ class DreameFilterLifeSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return state.filter_life_level if state else None
+        return getattr(state, "filter_life_level", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -269,7 +335,7 @@ class DreameMainBrushTimeLeftSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return getattr(state, "brush_left_time", None) if state else None
+        return getattr(state, "brush_left_time", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -291,7 +357,7 @@ class DreameSideBrushTimeLeftSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return getattr(state, "brush_left_time2", None) if state else None
+        return getattr(state, "brush_left_time2", 0) or 0
 
 
 # ---------------------------------------------------------------------------
@@ -313,7 +379,8 @@ class DreameFilterTimeLeftSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return getattr(state, "filter_left_time", None) if state else None
+        return getattr(state, "filter_left_time", 0) or 0
+
 
 # ---------------------------------------------------------------------------
 # TOTAL CLEANING COUNT SENSOR
@@ -333,7 +400,8 @@ class DreameTotalCleaningCountSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return getattr(state, "total_clean_count", None)
+        return getattr(state, "total_clean_count", 0) or 0
+
 
 # ---------------------------------------------------------------------------
 # TOTAL CLEANING AREA SENSOR
@@ -354,4 +422,69 @@ class DreameTotalCleaningAreaSensor(DreameBaseSensor):
     @property
     def native_value(self):
         state = self.coordinator.data
-        return getattr(state, "total_area", None)
+        return getattr(state, "total_area", 0) or 0
+
+
+# ---------------------------------------------------------------------------
+# VACUUM LAST SEEN SENSOR
+# ---------------------------------------------------------------------------
+
+class VacuumLastSeenSensor(CoordinatorEntity, SensorEntity):
+    """Sensor reporting last successful communication."""
+
+    _attr_icon = "mdi:clock-outline"
+
+    def __init__(self, name, uid, coordinator):
+        super().__init__(coordinator)
+        self._attr_name = f"{name} Last Seen"
+        self._attr_unique_id = f"{uid}_last_seen"
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, uid)}
+        )
+
+        self._last_seen = None
+
+    @property
+    def native_value(self):
+        """Return human-friendly time difference as main state."""
+        from homeassistant.util.dt import now, as_local
+
+        if self.coordinator.last_update_success:
+            self._last_seen = now()
+
+        if not self._last_seen:
+            return "Mai"
+
+        now_local = as_local(now())
+        last_local = as_local(self._last_seen)
+        diff = (now_local - last_local).total_seconds()
+
+        if diff < 60:
+            return f"{int(diff)} secondi fa"
+        elif diff < 3600:
+            return f"{int(diff // 60)} minuti fa"
+        elif diff < 86400:
+            return f"{int(diff // 3600)} ore fa"
+        else:
+            return last_local.strftime("%d %B %Y alle %H:%M")
+
+    @property
+    def extra_state_attributes(self):
+        """Return raw timestamp and seconds difference."""
+        if not self._last_seen:
+            return {
+                "timestamp": None,
+                "seconds_since": None
+            }
+
+        from homeassistant.util.dt import now, as_local
+        now_local = as_local(now())
+        last_local = as_local(self._last_seen)
+
+        diff = (now_local - last_local).total_seconds()
+
+        return {
+            "timestamp": self._last_seen.isoformat(),
+            "seconds_since": int(diff)
+        }

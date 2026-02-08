@@ -1,0 +1,124 @@
+{
+  "title": "Xiaomi Vacuum 1C",
+
+  "config": {
+    "step": {
+      "user": {
+        "title": "Xiaomi Vacuum 1C Setup",
+        "description": "Enter connection details for your Dreame/Xiaomi Vacuum 1C.",
+        "data": {
+          "host": "host",
+          "token": "token",
+          "name": "name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "cannot_connect",
+      "invalid_token": "invalid_token",
+      "unknown": "unknown"
+    },
+    "abort": {
+      "already_configured": "already_configured"
+    }
+  },
+
+  "entity": {
+    "sensor": {
+      "battery": {
+        "name": "Battery"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "cleaning_area": {
+        "name": "Cleaning Area"
+      },
+      "cleaning_time": {
+        "name": "Cleaning Time"
+      },
+      "main_brush_life": {
+        "name": "Main Brush Life"
+      },
+      "side_brush_life": {
+        "name": "Side Brush Life"
+      },
+      "filter_life": {
+        "name": "Filter Life"
+      },
+      "main_brush_time_left": {
+        "name": "Main Brush Time Left"
+      },
+      "side_brush_time_left": {
+        "name": "Side Brush Time Left"
+      },
+      "filter_time_left": {
+        "name": "Filter Time Left"
+      },
+      "total_cleaning_count": {
+        "name": "Total Cleaning Count"
+      },
+      "total_cleaning_area": {
+        "name": "Total Cleaning Area"
+      },
+      "last_seen": {
+        "name": "Last Seen"
+      },
+      "status": {
+        "name": "Status"
+      }
+    }
+  },
+
+  "state": {
+    "cleaning": "cleaning",
+    "paused": "paused",
+    "returning": "returning",
+    "docked": "docked",
+    "idle": "idle",
+    "error": "error",
+    "offline": "offline"
+  },
+
+  "friendly_status": {
+    "cleaning": "cleaning",
+    "paused": "paused",
+    "returning": "returning",
+    "docked": "docked",
+    "idle": "idle",
+    "error": "error",
+    "unknown": "unknown"
+  },
+
+  "errors": {
+    "NoError": "NoError",
+    "Drop": "Drop",
+    "Cliff": "Cliff",
+    "Bumper": "Bumper",
+    "Gesture": "Gesture",
+    "Bumper_repeat": "Bumper_repeat",
+    "Drop_repeat": "Drop_repeat",
+    "Optical_flow": "Optical_flow",
+    "No_box": "No_box",
+    "No_tankbox": "No_tankbox",
+    "Waterbox_empty": "Waterbox_empty",
+    "Box_full": "Box_full",
+    "Brush": "Brush",
+    "Side_brush": "Side_brush",
+    "Fan": "Fan",
+    "Left_wheel_motor": "Left_wheel_motor",
+    "Right_wheel_motor": "Right_wheel_motor",
+    "Turn_suffocate": "Turn_suffocate",
+    "Forward_suffocate": "Forward_suffocate",
+    "Charger_get": "Charger_get",
+    "Battery_low": "Battery_low",
+    "Charge_fault": "Charge_fault",
+    "Battery_percentage": "Battery_percentage",
+    "Heart": "Heart",
+    "Camera_occlusion": "Camera_occlusion",
+    "Camera_fault": "Camera_fault",
+    "Event_battery": "Event_battery",
+    "Forward_looking": "Forward_looking",
+    "Gyroscope": "Gyroscope"
+  }
+}

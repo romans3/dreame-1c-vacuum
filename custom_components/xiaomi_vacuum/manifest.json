@@ -19,5 +19,6 @@
   "iot_class": "local_polling",
   "integration_type": "device",
   "loggers": ["miio", "xiaomi_vacuum"],
-  "supported_platforms": ["vacuum", "sensor"]
+  "supported_platforms": ["vacuum", "sensor", "binary_sensor"],
+  "translations": "translations"
 }
