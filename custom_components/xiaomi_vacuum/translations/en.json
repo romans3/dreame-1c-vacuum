@@ -1,0 +1,123 @@
+{
+  "title": "Xiaomi Vacuum 1C",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Xiaomi Vacuum 1C Setup",
+        "description": "Enter connection details for your Dreame/Xiaomi Vacuum 1C.",
+        "data": {
+          "host": "IP Address",
+          "token": "Token",
+          "name": "Device Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the vacuum.",
+      "invalid_token": "Invalid token.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This vacuum is already configured."
+    }
+  },
+
+  "entity": {
+    "sensor": {
+      "battery": {
+        "name": "Battery"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "cleaning_area": {
+        "name": "Cleaning Area"
+      },
+      "cleaning_time": {
+        "name": "Cleaning Time"
+      },
+      "main_brush_life": {
+        "name": "Main Brush Life"
+      },
+      "side_brush_life": {
+        "name": "Side Brush Life"
+      },
+      "filter_life": {
+        "name": "Filter Life"
+      },
+      "main_brush_time_left": {
+        "name": "Main Brush Time Left"
+      },
+      "side_brush_time_left": {
+        "name": "Side Brush Time Left"
+      },
+      "filter_time_left": {
+        "name": "Filter Time Left"
+      },
+      "total_cleaning_count": {
+        "name": "Total Cleaning Count"
+      },
+      "total_cleaning_area": {
+        "name": "Total Cleaning Area"
+      },
+      "last_seen": {
+        "name": "Last Seen"
+      },
+      "status": {
+        "name": "Status"
+      }
+    }
+  },
+
+  "state": {
+    "cleaning": "Cleaning",
+    "paused": "Paused",
+    "returning": "Returning to base",
+    "docked": "Docked / Charging",
+    "idle": "Idle",
+    "error": "Error",
+    "offline": "Offline"
+  },
+
+  "friendly_status": {
+    "cleaning": "Cleaning in progress",
+    "paused": "Paused",
+    "returning": "Returning to base",
+    "docked": "Charging",
+    "idle": "Idle",
+    "error": "Error",
+    "unknown": "Unknown"
+  },
+
+  "errors": {
+    "NoError": "No error",
+    "Drop": "Drop detected",
+    "Cliff": "Cliff detected",
+    "Bumper": "Bumper collision",
+    "Gesture": "Gesture error",
+    "Bumper_repeat": "Repeated bumper collision",
+    "Drop_repeat": "Repeated drop",
+    "Optical_flow": "Optical flow error",
+    "No_box": "Dustbin missing",
+    "No_tankbox": "Water tank missing",
+    "Waterbox_empty": "Water tank empty",
+    "Box_full": "Dustbin full",
+    "Brush": "Main brush error",
+    "Side_brush": "Side brush error",
+    "Fan": "Fan error",
+    "Left_wheel_motor": "Left wheel motor error",
+    "Right_wheel_motor": "Right wheel motor error",
+    "Turn_suffocate": "Rotation blocked",
+    "Forward_suffocate": "Movement blocked",
+    "Charger_get": "Charging error",
+    "Battery_low": "Low battery",
+    "Charge_fault": "Charging fault",
+    "Battery_percentage": "Battery percentage error",
+    "Heart": "Heartbeat error",
+    "Camera_occlusion": "Camera occluded",
+    "Camera_fault": "Camera fault",
+    "Event_battery": "Battery event",
+    "Forward_looking": "Front sensor error",
+    "Gyroscope": "Gyroscope error"
+  }
+}
