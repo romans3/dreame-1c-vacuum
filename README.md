@@ -30,8 +30,6 @@ Fully Works with Homeassistant 2026.2.0
 ## ☕ Support the Project
 If you find this addon useful, buy me a coffee!
 
-PayPal
-
-paypal.me/giusepperomano1972
+PayPal: https://paypal.me/giusepperomano1972
 
 Every donation helps me continue to develop and improve this custom! 🙏
