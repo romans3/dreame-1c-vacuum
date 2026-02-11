@@ -28,8 +28,7 @@ Works with https://github.com/denysdovhan/vacuum-card
 Fully Works with Homeassistant 2026.2.0
 
 ## ☕ Support the Project
-If you find this addon useful, buy me a coffee!
-
-PayPal: https://paypal.me/giusepperomano1972
+[![Buy me a coffee](https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg)](https://paypal.me/giusepperomano1972)<span style="margin-left:15px;font-size:28px !important;">[Buy me a coffee](https://paypal.me/giusepperomano1972)</span></a>
+### [Support my work with a donation](https://paypal.me/giusepperomano1972)
 
 Every donation helps me continue to develop and improve this custom! 🙏
